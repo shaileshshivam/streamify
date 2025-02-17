@@ -1,86 +1,103 @@
-import { Typography } from "@mui/material";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+import { useTheme, Paper, Box, Typography } from "@mui/material";
+import { ResponsivePie } from "@nivo/pie";
+import { CHART_COLORS } from "../theme";
 
 interface RevenueDistributionProps {
-  data: { source: string; value: number }[];
-  onSegmentClick: (source: string) => void;
+  data: { id: string; label: string; value: number; color?: string }[];
 }
 
-function RevenueDistribution({
+export const RevenueDistribution: React.FC<RevenueDistributionProps> = ({
   data,
-  onSegmentClick,
-}: RevenueDistributionProps) {
-  const handleClick = (entry: { source: string }) => {
-    onSegmentClick(entry.source);
-  };
+}) => {
+  const theme = useTheme();
 
-  const renderCustomizedLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-  }) => {
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  const customColors = [
+    CHART_COLORS.primary,
+    CHART_COLORS.secondary,
+    CHART_COLORS.tertiary,
+    CHART_COLORS.quaternary,
+  ];
 
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor={x > cx ? "start" : "end"}
-        dominantBaseline="central"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
+  const formatValue = (value: number) => `$${(value / 1000000).toFixed(1)}M`;
 
   return (
-    <>
-      <Typography variant="h6" gutterBottom>
-        Revenue Distribution
-      </Typography>
-      <ResponsiveContainer width="100%" height={300}>
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-            onClick={handleClick}
-            label={renderCustomizedLabel}
-          >
-            {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-                name={entry.source}
-              />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend formatter={(value, entry, index) => data[index].source} />
-        </PieChart>
-      </ResponsiveContainer>
-    </>
-  );
-}
+    <Paper
+      sx={{
+        p: 2,
+        borderRadius: theme.shape.borderRadius,
+        boxShadow: theme.shadows[2],
+        width: "100%",
+        position: "relative",
+        overflow: "hidden",
 
-export default RevenueDistribution;
+        backgroundColor: "#D9AFD9",
+        backgroundImage: "linear-gradient(0deg, #D9AFD9 0%, #97D9E1 100%)",
+      }}
+    >
+      <Box sx={{ p: 2 }}>
+        <Typography
+          variant="h6"
+          gutterBottom
+          sx={{
+            color: "#424242",
+            fontWeight: 600,
+            letterSpacing: "0.5px",
+            mb: 3,
+          }}
+        >
+          Revenue Distribution
+        </Typography>
+        <Box sx={{ height: "252px" }}>
+          <ResponsivePie
+            data={data}
+            colors={customColors}
+            margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+            innerRadius={0.6}
+            padAngle={1.5}
+            cornerRadius={8}
+            activeOuterRadiusOffset={10}
+            borderWidth={0}
+            enableArcLinkLabels={true}
+            arcLinkLabelsSkipAngle={10}
+            arcLinkLabelsTextColor={{
+              from: "color",
+              modifiers: [["brighter", 3]],
+            }}
+            arcLinkLabelsThickness={3}
+            arcLinkLabelsColor={{ from: "color", modifiers: [["brighter", 3]] }}
+            arcLinkLabelsDiagonalLength={15}
+            arcLinkLabelsStraightLength={15}
+            arcLabelsSkipAngle={10}
+            arcLabelsTextColor={{ from: "color", modifiers: [["darker", 3]] }}
+            valueFormat={formatValue}
+            motionConfig="gentle"
+            transitionMode="pushOut"
+            legends={[
+              {
+                anchor: "left",
+                direction: "column",
+                justify: false,
+                translateX: -20,
+                translateY: 80,
+                itemsSpacing: 10,
+                itemWidth: 85,
+                itemHeight: 10,
+                itemTextColor: "#424242",
+                itemDirection: "left-to-right",
+                itemOpacity: 1,
+                symbolSize: 12,
+                symbolShape: "circle",
+                effects: [
+                  {
+                    on: "hover",
+                    style: { itemTextColor: CHART_COLORS.primary },
+                  },
+                ],
+              },
+            ]}
+          />
+        </Box>
+      </Box>
+    </Paper>
+  );
+};

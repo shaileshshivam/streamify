@@ -1,93 +1,75 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme } from "@mui/material";
 
-const theme = createTheme({
+export const CHART_COLORS = {
+  primary: "#60a5fa",
+  secondary: "#f48fb1",
+  tertiary: "#ffe082",
+  quaternary: "#81c784",
+  neutral: "#9e9e9e",
+};
+export const BASE_THEME = createTheme({
   palette: {
-    mode: 'light',
+    mode: "light",
     primary: {
-      main: '#46545d',
-      light: '#63a4d4',
-      dark: '#2c5f7c',
-      contrastText: '#ffffff',
+      main: "#4a90e2",
+      light: "#79b9ef",
+      dark: "#357abf",
+      contrastText: "#ffffff",
     },
     secondary: {
-      main: '#81c3d7',
-      light: '#b3e5f7',
-      dark: '#5295a9',
-      contrastText: '#000000',
+      main: "#f50057",
+      light: "#ff4081",
+      dark: "#c51162",
+      contrastText: "#ffffff",
     },
     background: {
-      default: '#f8f9fa',
-      paper: '#ffffff',
+      default: "#f9fafb",
+      paper: "#ffffff",
     },
     text: {
-      primary: '#2c3e50',
-      secondary: '#34495e',
+      primary: "#333333",
+      secondary: "#666666",
     },
-    error: {
-      main: '#e74c3c',
-    },
-    warning: {
-      main: '#f39c12',
-    },
-    info: {
-      main: '#3498db',
-    },
-    success: {
-      main: '#2ecc71',
-    },
+    error: { main: "#e74c3c" },
+    warning: { main: "#f39c12" },
+    info: { main: "#3498db" },
+    success: { main: "#2ecc71" },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontSize: '2.5rem',
-      fontWeight: 500,
-    },
-    h2: {
-      fontSize: '2rem',
-      fontWeight: 500,
-    },
+    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    h1: { fontSize: "2.5rem", fontWeight: 700, color: "#333333" },
+    h2: { fontSize: "2rem", fontWeight: 600, color: "#333333" },
     h3: {
-      fontSize: '1.75rem',
-      fontWeight: 500,
+      fontSize: "1.75rem",
+      fontWeight: 600,
+      color: "#333333",
+      lineHeight: 1.3,
+      letterSpacing: "0.5px",
     },
-    h4: {
-      fontSize: '1.5rem',
-      fontWeight: 500,
-    },
-    h5: {
-      fontSize: '1.25rem',
-      fontWeight: 500,
-    },
+    h4: { fontSize: "1.5rem", fontWeight: 600, color: "#333333" },
+    h5: { fontSize: "1.25rem", fontWeight: 600, color: "#333333" },
     h6: {
-      fontSize: '1rem',
-      fontWeight: 500,
+      fontSize: "1rem",
+      fontWeight: 600,
+      color: "#333333",
+      lineHeight: 1.4,
     },
-    body1: {
-      fontSize: '1rem',
-    },
-    body2: {
-      fontSize: '0.875rem',
-    },
+    body1: { fontSize: "1rem", color: "#666666", lineHeight: 1.6 },
+    body2: { fontSize: "0.875rem", color: "#666666" },
+    button: { fontWeight: 500 },
   },
-  shape: {
-    borderRadius: 8,
-  },
+  shape: { borderRadius: 3 },
   components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-        },
-      },
-    },
+    MuiButton: { styleOverrides: { root: { textTransform: "none" } } },
     MuiCard: {
+      styleOverrides: { root: { boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)" } },
+    },
+    MuiPaper: {
       styleOverrides: {
         root: {
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
         },
       },
     },
   },
 });
-
-export { theme };

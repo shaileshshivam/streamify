@@ -1,58 +1,85 @@
-import { Typography } from "@mui/material";
+import React, { useMemo } from "react";
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as BarTooltip,
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { Typography, useTheme } from "@mui/material";
 
-const CustomTooltip = ({ active, payload }) => {
-  if (active && payload && payload.length) {
+interface TopSongsChartProps {
+  data: { name: string; streams: number; artist: string }[];
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: {
+    name: string;
+    value: number;
+    payload: { name: string; streams: number; artist: string }; // Corrected type
+  }[];
+  label?: string | number;
+}
+
+const CustomTooltip: React.FC<CustomTooltipProps> = ({
+  active,
+  payload,
+  label,
+}) => {
+  const theme = useTheme();
+
+  if (active && payload && payload.length > 0 && payload[0]?.payload) {
     const data = payload[0].payload;
+
     return (
       <div
         style={{
-          backgroundColor: "rgba(255, 255, 255, 0.9)",
-          padding: "10px",
+          backgroundColor: "white",
+          padding: "12px 16px",
           border: "1px solid #ccc",
-          borderRadius: "4px",
+          borderRadius: theme.shape.borderRadius,
+          boxShadow: theme.shadows[3],
+          color: theme.palette.text.primary,
         }}
       >
-        <p>{`Song: ${data.name}`}</p>
-        <p>{`Streams: ${data.streams}`}</p>
+        {data.name && <p>Song: {data.name}</p>}
+        {data.artist && <p>Artist: {data.artist}</p>}
+        <p>Streams: {data.streams.toLocaleString()}</p>
       </div>
     );
   }
+
   return null;
 };
 
-function TopSongsChart({ data }) {
-  const formattedData = data.map((item, index) => ({
-    ...item,
-    chartIndex: index + 1,
-  }));
+const TopSongsChart: React.FC<TopSongsChartProps> = ({ data }) => {
+  const formattedData = useMemo(
+    () => data.map((item, index) => ({ ...item, chartIndex: index + 1 })),
+    [data]
+  );
 
   return (
     <>
       <Typography variant="h6" gutterBottom>
         Top 5 Streamed Songs
       </Typography>
+
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={formattedData}>
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis dataKey="chartIndex" />
           <YAxis width={80} />
-          <Tooltip content={<CustomTooltip active={undefined} payload={undefined} />} />
+          <BarTooltip content={<CustomTooltip />} />
           <Legend />
-          <Bar dataKey="streams" fill="#8884d8" />
+          <Bar dataKey="streams" fill="rgb(136, 132, 216)" />
         </BarChart>
       </ResponsiveContainer>
     </>
   );
-}
+};
 
-export default TopSongsChart;
+export { TopSongsChart };

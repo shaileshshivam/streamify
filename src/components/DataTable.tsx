@@ -1,97 +1,92 @@
-import { useState, useEffect } from "react";
-import { Typography, TextField } from "@mui/material";
-import { DataGrid, GridColDef, GridFilterModel } from "@mui/x-data-grid";
+import { useTheme, Paper, Typography, TextField, Box } from "@mui/material";
+import {
+  DataGrid,
+  GridColDef,
+  GridFilterModel,
+  GridRowId,
+} from "@mui/x-data-grid";
+import React from "react";
 
-const columns: GridColDef[] = [
-  { field: "songName", headerName: "Song Name", flex: 1 },
-  { field: "artist", headerName: "Artist", flex: 1 },
-  { field: "dateStreamed", headerName: "Date Streamed", flex: 1 },
-  { field: "streamCount", headerName: "Stream Count", type: "number", flex: 1 },
-  { field: "userId", headerName: "User ID", flex: 1 },
-  { field: "revenueSource", headerName: "Revenue Source", flex: 1 },
-];
-
-interface DataTableProps {
-  data: {
-    id: number;
-    songName: string;
-    artist: string;
-    dateStreamed: string;
-    streamCount: number;
-    userId: string;
-    revenueSource: string;
-  }[];
-  revenueSourceFilter: string | null;
+interface DataTableProps<T extends {}> {
+  data: T[];
+  columns: GridColDef[];
+  rowIdField: keyof T;
+  title?: string;
 }
 
-function DataTable({ data, revenueSourceFilter }: DataTableProps) {
-  const [filterModel, setFilterModel] = useState<GridFilterModel>({
+export const DataTable: React.FC<DataTableProps<any>> = ({
+  data,
+  title = "Data Table",
+  columns,
+  rowIdField,
+}) => {
+  const [filterModel, setFilterModel] = React.useState<GridFilterModel>({
     items: [],
   });
+  const [searchText, setSearchText] = React.useState("");
+  const theme = useTheme();
 
-  useEffect(() => {
-    if (revenueSourceFilter) {
-      setFilterModel({
-        items: [
-          {
-            id: 1,
-            field: "revenueSource",
-            operator: "equals",
-            value: revenueSourceFilter,
-          },
-        ],
-      });
-    } else {
-      setFilterModel({ items: [] });
-    }
-  }, [revenueSourceFilter]);
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const text = event.target.value;
+    setSearchText(text);
+
+    const newFilterModel: GridFilterModel = {
+      items: text
+        ? columns
+            .filter((col) => col.field && col.headerName)
+            .map((col) => ({
+              id: col.field as GridRowId,
+              field: col.field,
+              operator: "contains",
+              value: text,
+            }))
+        : [],
+    };
+    setFilterModel(newFilterModel);
+  };
 
   return (
-    <>
+    <Paper
+      style={{ borderRadius: "0.5rem", padding: "1rem", marginBlock: "2rem" }}
+    >
       <Typography variant="h6" gutterBottom>
-        Recent Streams
+        {title}
       </Typography>
+
       <TextField
-        label="Filter by song or artist"
+        label="Search"
         variant="outlined"
         fullWidth
         margin="normal"
-        onChange={(e) => {
-          setFilterModel({
-            items: [
-              {
-                id: 1,
-                field: "songName",
-                operator: "contains",
-                value: e.target.value,
-              },
-              ...(revenueSourceFilter
-                ? [
-                    {
-                      id: 2,
-                      field: "revenueSource",
-                      operator: "equals",
-                      value: revenueSourceFilter,
-                    },
-                  ]
-                : []),
-            ],
-          });
+        value={searchText}
+        onChange={handleSearchChange}
+        sx={{
+          mb: 2,
+
+          "& .MuiOutlinedInput-root": {
+            borderRadius: theme.shape.borderRadius,
+
+            "&:hover fieldset": {
+              borderColor: theme.palette.primary.light,
+            },
+          },
         }}
       />
-      <div>
+      <Box width="100%">
         <DataGrid
           rows={data}
           columns={columns}
+          getRowId={(row) => row[rowIdField] as string}
+          pageSizeOptions={[5, 10, 25]}
           initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
           filterModel={filterModel}
-          onFilterModelChange={(newFilterModel) =>
-            setFilterModel(newFilterModel)
-          }
+          onFilterModelChange={(model) => setFilterModel(model)}
+          sx={{
+            borderRadius: theme.shape.borderRadius,
+            boxShadow: theme.shadows[2],
+          }}
         />
-      </div>
-    </>
+      </Box>
+    </Paper>
   );
-}
-
-export default DataTable;
+};
